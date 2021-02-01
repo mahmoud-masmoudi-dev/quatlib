@@ -13,11 +13,26 @@ public class Quat {
         return quat != null && quat.length == QUAT_ARRAY_SIZE;
     }
 
+    private static boolean isValid(float[] quat) {
+        return quat != null && quat.length == QUAT_ARRAY_SIZE;
+    }
+
     // Public functions ----------------------------------------------------------------------------
     public static double[] getVectPart(double[] quat) {
         ErrorChecker.assertCondition(isValid(quat), "Invalid quat");
 
         double[] vect = new double[Vect.VECT_ARRAY_SIZE];
+        for(int i = 1; i < QUAT_ARRAY_SIZE; i++) {
+            vect[i-1] = quat[i];
+        }
+
+        return vect;
+    }
+
+    public static float[] getVectPart(float[] quat) {
+        ErrorChecker.assertCondition(isValid(quat), "Invalid quat");
+
+        float[] vect = new float[Vect.VECT_ARRAY_SIZE];
         for(int i = 1; i < QUAT_ARRAY_SIZE; i++) {
             vect[i-1] = quat[i];
         }
@@ -49,10 +64,28 @@ public class Quat {
         return outQuat;
     }
 
+    public static float[] scale(float alpha, float[] inQuat) {
+        ErrorChecker.assertCondition(isValid(inQuat), "Invalid quat");
+
+        float[] outQuat = new float[QUAT_ARRAY_SIZE];
+
+        for(int i = 0; i < QUAT_ARRAY_SIZE; i++) {
+            outQuat[i] = alpha*inQuat[i];
+        }
+
+        return outQuat;
+    }
+
     public static double[] invert(double[] inQuat) {
         ErrorChecker.assertCondition(isValid(inQuat), "Invalid quat");
 
-        return scale(-1, inQuat);
+        return scale(1/(Math.pow(norm(inQuat), 2)), conjQuat(inQuat));
+    }
+
+    public static float[] invert(float[] inQuat) {
+        ErrorChecker.assertCondition(isValid(inQuat), "Invalid quat");
+
+        return scale((float) (1/(Math.pow(norm(inQuat), 2))), conjQuat(inQuat));
     }
 
     public static double norm(double[] quat) {
@@ -65,7 +98,23 @@ public class Quat {
         return (double) Math.sqrt(squaredSum);
     }
 
+    public static float norm(float[] quat) {
+        float squaredSum = 0.0f;
+
+        for(int i = 0; i < QUAT_ARRAY_SIZE; i++) {
+            squaredSum += quat[i]*quat[i];
+        }
+
+        return (float) Math.sqrt(squaredSum);
+    }
+
     public static double[] normalize(double[] quat) {
+        ErrorChecker.assertCondition(isValid(quat), "Invalid quat");
+
+        return scale(1/norm(quat), quat);
+    }
+
+    public static float[] normalize(float[] quat) {
         ErrorChecker.assertCondition(isValid(quat), "Invalid quat");
 
         return scale(1/norm(quat), quat);
@@ -81,6 +130,16 @@ public class Quat {
         return outQuat;
     }
 
+    public static float[] conjQuat(float[] inQuat) {
+        ErrorChecker.assertCondition(isValid(inQuat), "Invalid quat");
+
+        float[] outQuat = scale(-1.0f, inQuat);
+
+        outQuat[0] *= -1;
+
+        return outQuat;
+    }
+
     public static double[] multiply2Quats(double[] quat1, double[] quat2) {
         ErrorChecker.assertCondition(isValid(quat1) && isValid(quat2), "Invalid quat(s)");
 
@@ -90,6 +149,26 @@ public class Quat {
         double[] v1 = getVectPart(quat1), v2 = getVectPart(quat2);
 
         double[] vectPart = Vect.scale(r1, v2);
+        vectPart = Vect.add(vectPart, Vect.scale(r2, v1));
+        vectPart = Vect.add(vectPart, Vect.cross(v1, v2));
+
+        quat[0] = r1*r2 - Vect.dot(v1, v2);
+        quat[1] = vectPart[0];
+        quat[2] = vectPart[1];
+        quat[3] = vectPart[2];
+
+        return quat;
+    }
+
+    public static float[] multiply2Quats(float[] quat1, float[] quat2) {
+        ErrorChecker.assertCondition(isValid(quat1) && isValid(quat2), "Invalid quat(s)");
+
+        float[] quat = new float[QUAT_ARRAY_SIZE];
+
+        float r1 = quat1[0], r2 = quat2[0];
+        float[] v1 = getVectPart(quat1), v2 = getVectPart(quat2);
+
+        float[] vectPart = Vect.scale(r1, v2);
         vectPart = Vect.add(vectPart, Vect.scale(r2, v1));
         vectPart = Vect.add(vectPart, Vect.cross(v1, v2));
 

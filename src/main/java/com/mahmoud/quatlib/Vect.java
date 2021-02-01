@@ -25,6 +25,10 @@ public class Vect {
         return vect != null && vect.length == VECT_ARRAY_SIZE;
     }
 
+    static boolean isValid(float[] vect) {
+        return vect != null && vect.length == VECT_ARRAY_SIZE;
+    }
+
     static boolean isValid2D(double[] vect) {
         return vect != null && vect.length == VECT_2D_ARRAY_SIZE;
     }
@@ -33,6 +37,17 @@ public class Vect {
         ErrorChecker.assertCondition(isValid(vect1) && isValid(vect2), "Invalid vect(s)");
 
         double sum = 0.0f;
+        for(int i = 0; i < VECT_ARRAY_SIZE; i++) {
+            sum += vect1[i]*vect2[i];
+        }
+
+        return sum;
+    }
+
+    public static float dot(float[] vect1, float[] vect2) {
+        ErrorChecker.assertCondition(isValid(vect1) && isValid(vect2), "Invalid vect(s)");
+
+        float sum = 0.0f;
         for(int i = 0; i < VECT_ARRAY_SIZE; i++) {
             sum += vect1[i]*vect2[i];
         }
@@ -52,10 +67,34 @@ public class Vect {
         return outVect;
     }
 
+    public static float[] cross(float[] vect1, float[] vect2) {
+        ErrorChecker.assertCondition(isValid(vect1) && isValid(vect2), "Invalid vect(s)");
+
+        float[] outVect = new float[VECT_ARRAY_SIZE];
+
+        outVect[0] = vect1[1]*vect2[2] - vect1[2]*vect2[1];
+        outVect[1] = vect2[0]*vect1[2] - vect1[0]*vect2[2];
+        outVect[2] = vect1[0]*vect2[1] - vect1[1]*vect2[0];
+
+        return outVect;
+    }
+
     public static double[] add(double[] vect1, double[] vect2) {
         ErrorChecker.assertCondition(isValid(vect1) && isValid(vect2), "Invalid vect(s)");
 
         double[] vect = new double[VECT_ARRAY_SIZE];
+
+        for(int i = 0; i < VECT_ARRAY_SIZE; i++) {
+            vect[i] = vect1[i] + vect2[i];
+        }
+
+        return vect;
+    }
+
+    public static float[] add(float[] vect1, float[] vect2) {
+        ErrorChecker.assertCondition(isValid(vect1) && isValid(vect2), "Invalid vect(s)");
+
+        float[] vect = new float[VECT_ARRAY_SIZE];
 
         for(int i = 0; i < VECT_ARRAY_SIZE; i++) {
             vect[i] = vect1[i] + vect2[i];
@@ -80,6 +119,18 @@ public class Vect {
         ErrorChecker.assertCondition(isValid(inVect), "Invalid vect");
 
         double[] outVect = new double[VECT_ARRAY_SIZE];
+
+        for(int i = 0; i < VECT_ARRAY_SIZE; i++) {
+            outVect[i] = alpha*inVect[i];
+        }
+
+        return outVect;
+    }
+
+    public static float[] scale(float alpha, float[] inVect) {
+        ErrorChecker.assertCondition(isValid(inVect), "Invalid vect");
+
+        float[] outVect = new float[VECT_ARRAY_SIZE];
 
         for(int i = 0; i < VECT_ARRAY_SIZE; i++) {
             outVect[i] = alpha*inVect[i];
